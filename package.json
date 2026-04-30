@@ -1,0 +1,13 @@
+{
+  "name": "fotaza",
+  "version": "1.0.0",
+  "description": "Proyecto integrador de Programacion Web 2",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rocio Fernandez",
+  "license": "ISC"
+}
