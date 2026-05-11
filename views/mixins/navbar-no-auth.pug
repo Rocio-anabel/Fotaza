@@ -1,0 +1,12 @@
+mixin navbar-no-auth
+    nav.navbar.bg-light.px-4.py-2.border-bottom.border-5.border-dark.shadow.p-3.mb-5
+            .container-fluid
+
+                a.navbar-brand.m-0(href="#")
+                    img.logo-navbar(src="/images/Fotaza_logo.png" alt="Fotaza" height="50")
+                form.d-flex(role="search")
+                    input.form-control.me-2(type="search" placeholder="Buscar" aria-label="Search")
+                    button.btn.btn-dark(type="submit") Buscar
+                .d-flex.align-items-center.gap-2
+                    a.btn.btn-outline-dark.btn-sm(href="#")| Registrarse
+                    a.btn.btn-dark.btn-sm(href="#")| Iniciar Sesión
