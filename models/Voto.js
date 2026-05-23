@@ -13,6 +13,16 @@ Voto.init(
         valor: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+        idUsuario: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: { model: 'Usuario', key: 'idUsuario'},
+        },
+        idImagen: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {model: 'Imagen', key: 'idImagen'},
         }
     },
     {
@@ -22,6 +32,12 @@ Voto.init(
         createdAt: 'fecha_creacion',
         updatedAt: 'fecha_actualizacion',
         paranoid: true,
-        deletedAt: 'fecha_borrado'
+        deletedAt: 'fecha_borrado',
+        indexes: [
+            {
+                unique: true,
+                fields: ['idUsuario', 'idImagen'] 
+            }
+        ]
     }
 )
