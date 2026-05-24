@@ -8,37 +8,51 @@ import { Voto } from './Voto.js';
 import { Comentario } from './Comentario.js';
 
 
+
 Usuario.belongsToMany(Usuario, {
     through: UsuarioSeguidor,
-    foreignKey: 'idUsuario',
-    otherKey: 'idSeguidor',
+    foreignKey: 'id_usuario',
+    otherKey: 'id_seguidor',
     as: 'seguidores'
 });
 
 Usuario.belongsTo(Usuario, {
     through: UsuarioSeguidor,
-    foreignKey:'idSeguidor',
-    otherKey: 'idUsuario',
+    foreignKey:'id_seguidor',
+    otherKey: 'id_usuario',
     as: 'seguidos'
 });
 
-Usuario.hasMany(Publicacion);
-Publicacion.belongsTo(Usuario);
+Usuario.hasMany(Publicacion, {foreignKey: 'id_usuario'});
+Publicacion.belongsTo(Usuario, {foreignKey: 'id_usuario'});
 
-Publicacion.hasMany(Imagen);
-Imagen.belongsTo(Publicacion);
+Publicacion.hasMany(Imagen, {foreignKey: 'id_publicacion'});
+Imagen.belongsTo(Publicacion, {foreignKey: 'id_publicacion'});
 
-Publicacion.hasMany(Etiqueta);
-Etiqueta.belongsTo(Publicacion);
+Publicacion.hasMany(Etiqueta, {foreignKey: 'id_publicacion'});
+Etiqueta.belongsTo(Publicacion, {foreignKey: 'id_publicacion'});
 
-Usuario.hasMany(Voto);
-Voto.belongsTo(Usuario);
+Usuario.hasMany(Voto, {foreignKey: 'id_usuario'});
+Voto.belongsTo(Usuario, {foreignKey: 'id_usuario'});
 
-Imagen.hasMany(Voto);
-Voto.belongsTo(Imagen);
+Imagen.hasMany(Voto, {foreignKey: 'id_imagen'});
+Voto.belongsTo(Imagen, {foreignKey: 'id_imagen'});
 
-Usuario.hasMany(Comentario);
-Comentario.belongsTo(Usuario);
+Usuario.hasMany(Comentario, {foreignKey: 'id_usuario'});
+Comentario.belongsTo(Usuario, {foreignKey: 'id_usuario'});
 
-Imagen.hasMany(Comentario);
-Comentario.belongsTo(Imagen);
+Imagen.hasMany(Comentario, {foreignKey: 'id_imagen'});
+Comentario.belongsTo(Imagen, {foreignKey: 'id_imagen'});
+
+export async function connectDatabase() {
+  try {
+    await sequelize.authenticate(); 
+    console.log('Conexion a base de datos establecida')
+
+    await sequelize.sync({ alter: true });
+    console.log('Sincronizacion de base de datos')
+  } catch (error) {
+    console.error('Error en la conexion a la base de datos', error)
+    throw error
+  }
+}

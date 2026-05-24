@@ -22,6 +22,8 @@ Publicacion.init(
     },
     {
         sequelize,
+        tableName: 'Publicacion',
+        modelName: 'Publicacion',
         underscored: true,
         timestamps: true,
         createdAt: 'fecha_creacion',

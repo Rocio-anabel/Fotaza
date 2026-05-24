@@ -1,5 +1,5 @@
 import { Model, DataTypes } from "sequelize";
-import sequelize from "../config/database";
+import sequelize from "../config/database.js";
 
 export class Voto extends Model{}
 
@@ -14,20 +14,12 @@ Voto.init(
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        idUsuario: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: { model: 'Usuario', key: 'idUsuario'},
-        },
-        idImagen: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {model: 'Imagen', key: 'idImagen'},
-        }
     },
     {
         sequelize,
         underscored: true,
+        tableName: 'Voto',
+        modelName: 'Voto',
         timestamps: true,
         createdAt: 'fecha_creacion',
         updatedAt: 'fecha_actualizacion',
@@ -36,7 +28,7 @@ Voto.init(
         indexes: [
             {
                 unique: true,
-                fields: ['idUsuario', 'idImagen'] 
+                fields: ['id_usuario', 'id_imagen'] 
             }
         ]
     }

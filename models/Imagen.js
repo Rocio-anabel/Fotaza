@@ -39,6 +39,8 @@ Imagen.init(
     {
         sequelize,
         underscored: true,
+        tableName: 'Imagen',
+        modelName: 'Imagen',
         timestamps: true,
         createdAt: 'fecha_creacion',
         updatedAt: 'fecha_actualizacion',

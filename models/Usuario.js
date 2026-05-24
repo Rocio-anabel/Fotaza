@@ -47,6 +47,8 @@ Usuario.init(
     },
     {
         sequelize,
+        tableName: 'Usuario',
+        modelName: 'Usuario',
         underscored: true,
         timestamps: true,
         createdAt: 'fecha_creacion',

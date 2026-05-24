@@ -18,6 +18,8 @@ Etiqueta.init(
     {
         sequelize,
         underscored: true,
+        tableName: 'Etiqueta',
+        modelName: 'Etiqueta',
         timestamps: true,
         createdAt: 'fecha_creacion',
         updatedAt: false,
