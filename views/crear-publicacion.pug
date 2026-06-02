@@ -1,0 +1,238 @@
+include mixins/navbar-auth.pug 
+include mixins/footer.pug 
+
+doctype html 
+html 
+    head 
+        title Nueva publicación - Fotaza
+        link(rel='stylesheet', href='/css/bootstrap.min.css')
+        link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css")
+        style. 
+
+            body {
+                background-color: #f3f3f3;
+            }
+
+            .create-post-card{
+                max-width: 950px;
+
+                border: none;
+                border-radius: 28px;
+
+                overflow: hidden;
+
+                background-color: white;
+
+                box-shadow:
+                    0 10px 40px rgba(0,0,0,.08);
+            }
+
+            .page-title{
+                font-size: 3rem;
+                font-weight: 800;
+            }
+
+            .form-control,
+            .form-select{
+                border-radius: 14px;
+                padding: 12px;
+            }
+
+            .form-control:focus,
+            .form-select:focus{
+                box-shadow: none;
+                border-color: #212529;
+            }
+
+            .publish-btn{
+                background-color: #212529;
+                color: white;
+
+                border-radius: 14px;
+
+                padding: 14px;
+
+                transition: .2s;
+            }
+
+            .publish-btn:hover{
+                background-color: black;
+                color: white;
+            }
+
+            .upload-box{
+                border: 2px dashed #cfcfcf;
+                border-radius: 20px;
+
+                padding: 40px;
+
+                text-align: center;
+
+                background-color: #fafafa;
+            }
+
+            .upload-icon{
+                font-size: 3rem;
+            }
+
+            .tag-preview{
+                background-color: #212529;
+                color: white;
+
+                border-radius: 999px;
+
+                padding: 8px 14px;
+
+                font-size: .9rem;
+            }
+    body 
+        +navbar-auth(avatar)
+        .container.py-5
+
+            .card.create-post-card.mx-auto.p-4.p-md-5
+
+                .mb-5.text-center
+
+                    h1.page-title.mb-2
+                        | Nueva publicación
+
+                    p.text-muted.mb-0
+                        | Comparte una nueva fotografía con la comunidad.
+
+                form(action="/publicacion/crear" method="POST" enctype="multipart/form-data" novalidate class="needs-validation")
+
+                    .row.g-4
+
+                        // Título
+                        .col-12
+
+                            label.form-label Título
+
+                            input.form-control(
+                                type="text"
+                                name="titulo"
+                                value= data.titulo || ''
+                                class= errors.titulo ? 'is-invalid' : ''
+                                placeholder="Título de la publicación"
+                                required
+                            )
+                            if errors.titulo
+                                .invalid-feedback= errors.titulo[0]
+                        // Descripción
+                        .col-12
+
+                            label.form-label
+                                | Descripción
+                                span.text-muted
+                                    |  (opcional)
+
+                            textarea.form-control(
+                                name="descripcion"
+                                rows="5"
+                                placeholder="Escribe algo sobre tu fotografía..."
+                            )
+
+                        // Imágenes
+                        .col-12
+
+                            label.form-label
+                                | Imágenes
+                                span.text-danger
+                                    |  *
+
+                            .upload-box
+
+                                i.bi.bi-images.upload-icon.d-block.mb-3
+
+                                p.mb-3.text-muted
+                                    | Puedes subir una o varias imágenes.
+
+                                input.form-control(
+                                    type="file"
+                                    name="imagenes"
+                                    accept="image/*"
+                                    class=errors.imagenes ? 'is-invalid' : ''
+                                    multiple
+                                    required
+                                )
+                                if errors.imagenes
+                                    .invalid-feedback= errors.imagenes[0]
+                        // Licencia imágenes
+                        .col-12
+
+                            h5.mb-3 Licencia de imágenes
+
+                            .form-check.mb-3
+
+                                input.form-check-input(
+                                    type="checkbox"
+                                    id="licenciaCheck"
+                                    name="licencia"
+                                    checked= data.licencia === 'on'
+                                )
+
+                                label.form-check-label(for="licenciaCheck")
+                                    | Las imágenes están bajo licencia
+
+                            
+                            #watermarkContainer.d-none
+
+                                label.form-label Texto de marca de agua
+
+                                input.form-control(
+                                    type="text"
+                                    name="marcaAgua"
+                                    placeholder="Ej: © Nombre Apellido - Fotaza"
+                                    value=data.marcaAgua || ''
+                                    class=errors.marcaAgua ? 'is-invalid' : ''
+                                )
+                                if errors.marcaAgua 
+                                    .invalid-feedback= errors.marcaAgua[0]
+
+                                .form-text
+                                    | Este texto se utilizará como marca de agua en las imágenes.
+
+                        // Etiquetas
+                        .col-12
+
+                            label.form-label
+                                | Etiquetas
+                                span.text-danger
+                                    |  *
+
+                            input.form-control.mb-3(
+                                type="text"
+                                name="etiquetas"
+                                value=data.etiquetas || ''
+                                class=errors.etiquetas ? 'is-invalid' : ''
+                                placeholder="Ej: naturaleza, retrato, blanco, negro"
+                                required
+                            )
+                            if errors.etiquetas 
+                                .invalid-feedback= errors.etiquetas[0]
+                            
+
+                        // Botón
+                        .col-12.mt-4
+
+                            button.btn.publish-btn.w-100(type="submit")
+                                | Publicar
+        +footer()
+    script(src='/script/bootstrap.bundle.min.js')
+    script.
+        const licenciaCheck = document.getElementById('licenciaCheck');
+        const watermarkContainer = document.getElementById('watermarkContainer');
+    
+        licenciaCheck.addEventListener('change', () => {
+        
+            if(licenciaCheck.checked){
+                watermarkContainer.classList.remove('d-none');
+            }else{
+                watermarkContainer.classList.add('d-none');
+            }
+    
+        });
+        const form = document.querySelector('.needs-validation')
+        form.addEventListener('submit', e => {
+          form.classList.add('was-validated')
+        })

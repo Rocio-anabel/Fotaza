@@ -1,0 +1,313 @@
+include mixins/navbar-auth.pug 
+include mixins/footer.pug 
+include mixins/navbar-no-auth.pug 
+
+doctype html 
+html 
+    head 
+        title= publicacion.titulo
+        link(rel='stylesheet', href='/css/bootstrap.min.css')
+        link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css")
+    
+    body 
+        if autenticado
+             +navbar-auth(avatar)
+        else 
+            +navbar-no-auth()
+        
+        .container.py-4
+            .d-flex.flex-column.align-items-center
+        
+                .col-12.col-lg-8
+        
+                    .card.shadow-sm.rounded-4.overflow-hidden(data-publicacion-id= publicacion.idPublicacion)
+        
+                        // HEADER
+                        .card-header.bg-white.border-0.d-flex.align-items-center.gap-2.py-2.px-3
+        
+                            img.rounded-circle.shadow-sm(
+                                src= publicacion.Usuario.avatar ? publicacion.Usuario.avatar : '/images/avatar-default.svg'
+                                alt="Avatar"
+                                width="45"
+                                height="45"
+                                style="object-fit: cover;"
+                            )
+        
+                            .d-flex.flex-column
+                                span.fw-semibold= publicacion.Usuario.nombre + ' ' + publicacion.Usuario.apellido
+
+                        
+    
+                        // CARROUSEL
+                        .carousel.slide(id=`carousel-${publicacion.idPublicacion}`)
+        
+                            .carousel-inner
+
+                                each imagen, index in publicacion.Imagens
+        
+                                    .carousel-item.position-relative(class= index === 0 ? 'active' : '' data-index= index)
+
+                                        img.d-block.w-100(
+                                            src= imagen.foto
+                                            style="height: 500px; object-fit: cover;"
+                                        )
+
+                                        // ACCIONES IMAGEN
+                                        .position-absolute.bottom-0.end-0.p-3.d-flex.gap-2
+
+                                            if imagen.licencia
+
+                                                button.btn.btn-warning.rounded-circle.shadow-sm(
+                                                    title="Me interesa esta imagen"
+                                                )
+                                                    i.bi.bi-currency-dollar.fs-5
+
+                                            button.btn.btn-light.rounded-circle.shadow-sm
+                                                i.bi.bi-bookmark.fs-5
+                                            
+                                            button.btn.btn-light.rounded-circle.shadow-sm(
+                                                data-bs-toggle="modal"
+                                                data-bs-target=`#commentsModal-${imagen.idImagen}`
+                                            )
+                                                i.bi.bi-chat-left-text.fs-5
+
+                                            button.btn.btn-light.rounded-circle.shadow-sm(
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#reportImageModal"
+                                            )
+                                                i.bi.bi-flag.fs-5.text-danger
+
+                                
+                            if publicacion.Imagens.length > 1
+                                button.carousel-control-prev(
+                                    type="button"
+                                    data-bs-target= `carousel-${publicacion.idPublicacion}`
+                                    data-bs-slide="prev"
+                                )
+                                    span.carousel-control-prev-icon
+
+                                button.carousel-control-next(
+                                    type="button"
+                                    data-bs-target= `carousel-${publicacion.idPublicacion}`
+                                    data-bs-slide="next"
+                                )
+                                    span.carousel-control-next-icon
+        
+                        // BODY
+                        .card-body
+        
+                            h3.fw-bold.mb-2
+                                | 
+                                = publicacion.titulo
+        
+
+                            if publicacion.descripcion
+                                p.text-muted.mb-3
+                                    | 
+                                    =publicacion.descripcion
+        
+                            // ETIQUETAS
+                        
+                            .d-flex.flex-wrap.gap-2.mb-4
+        
+                                each etiqueta in publicacion.Etiqueta
+                                
+                                    span.badge.text-bg-primary
+                                        | ##{etiqueta.nombreEtiqueta}
+                            
+                            detalleImagen(id=`detalleImagen-${publicacion.idPublicacion}`)
+
+                        each imagen in publicacion.Imagens
+
+                            .modal.fade(
+                                id=`commentsModal-${imagen.idImagen}`
+                                tabindex="-1"
+                                aria-hidden="true"
+                            )
+
+                                .modal-dialog.modal-dialog-centered.modal-dialog-scrollable
+
+                                    .modal-content
+
+                                        .modal-header
+
+                                            h5.modal-title Comentarios
+
+                                            button.btn-close(
+                                                type="button"
+                                                data-bs-dismiss="modal"
+                                            )
+
+                                        .modal-body
+
+                                            if imagen.Comentarios.length
+
+                                                each comentario in imagen.Comentarios
+
+                                                    .d-flex.align-items-start.gap-2.mb-3
+
+                                                        img.rounded-circle(
+                                                            src=comentario.Usuario.avatar || "/images/avatar-default.svg"
+                                                            width="40"
+                                                            height="40"
+                                                            style="object-fit: cover;"
+                                                        )
+
+                                                        div
+
+                                                            p.mb-1
+
+                                                                strong= comentario.Usuario.nombre
+
+                                                                |  #{comentario.descripcion}
+
+                                            else
+
+                                                p.text-muted
+                                                    | Esta imagen aún no tiene comentarios.
+
+                                        .modal-footer
+                                            if !imagen.comentarioClausurado
+
+                                                form.w-100(
+                                                    action="/comentarios"
+                                                    method="POST"
+                                                )
+
+                                                    input(
+                                                        type="hidden"
+                                                        name="idImagen"
+                                                        value=imagen.idImagen
+                                                    )
+
+                                                    .d-flex.align-items-center.gap-2
+
+                                                        input.form-control(
+                                                            type="text"
+                                                            name="comentario"
+                                                            placeholder="Añade un comentario..."
+                                                            required
+                                                        )
+
+                                                        button.btn.btn-primary(
+                                                            type="submit"
+                                                        )
+                                                            | Publicar
+
+                                            else
+
+                                                .w-100.text-center
+
+                                                    i.bi.bi-lock-fill.text-secondary.fs-4
+
+                                                    p.mb-0.mt-2.text-muted
+                                                        | Los comentarios de esta imagen están cerrados.
+        +footer()                                  
+        
+
+
+        
+        
+// MODAL DENUNCIA IMAGEN
+#reportImageModal.modal.fade(
+    tabindex="-1"
+)
+    .modal-dialog.modal-dialog-centered.modal-dialog-scrollable
+        .modal-content
+
+            .modal-header
+                h5.modal-title Denunciar imagen
+
+                button.btn-close(
+                    type="button"
+                    data-bs-dismiss="modal"
+                )
+
+            .modal-body
+
+                .mb-3
+                    label.form-label Motivo
+
+                    select.form-select
+                        option(selected disabled)
+                            | Selecciona un motivo
+
+                        option Contenido ofensivo
+                        option Spam
+                        option Violencia
+                        option Acoso
+
+                .mb-3
+                    label.form-label Justificación
+
+                    textarea.form-control(
+                        rows="5"
+                        placeholder="Describe el problema..."
+                    )
+
+            .modal-footer
+
+                button.btn.btn-secondary(
+                    data-bs-dismiss="modal"
+                )
+                    | Cancelar
+
+                button.btn.btn-danger
+                    | Enviar denuncia
+
+
+
+// MODAL DENUNCIA COMENTARIO
+#reportCommentModal.modal.fade(
+    tabindex="-1"
+)
+    .modal-dialog.modal-dialog-centered.modal-dialog-scrollable
+        .modal-content
+
+            .modal-header
+                h5.modal-title Denunciar comentario
+
+                button.btn-close(
+                    type="button"
+                    data-bs-dismiss="modal"
+                )
+
+            .modal-body
+
+                .mb-3
+                    label.form-label Motivo
+
+                    select.form-select
+                        option(selected disabled)
+                            | Selecciona un motivo
+
+                        option Acoso
+                        option Spam
+                        option Insultos
+                        option Otro
+
+                .mb-3
+                    label.form-label Justificación
+
+                    textarea.form-control(
+                        rows="5"
+                        placeholder="Describe el problema..."
+                    )
+
+            .modal-footer
+
+                button.btn.btn-secondary(
+                    data-bs-dismiss="modal"
+                )
+                    | Cancelar
+
+                button.btn.btn-danger
+                    | Enviar denuncia
+
+    
+
+
+        script(src='/script/bootstrap.bundle.min.js')
+        script.
+            window.imagenesPublicacion = !{JSON.stringify(publicacion.Imagens)};
+        script(src='/script/publicacion.js')
