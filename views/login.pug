@@ -89,7 +89,7 @@ html
                         p.text-muted.mb-5
                           | Bienvenido nuevamente a Fotaza.
 
-                        form(action="/auth/login" method="POST")
+                        form(action="/auth/login" method="POST" novalidate class="needs-validation")
 
                           .mb-4
                             label.form-label Correo electrónico
@@ -97,9 +97,14 @@ html
                             input.form-control(
                               type="email"
                               name="email"
+                              class= errors.email ? 'is-invalid' : ''
+                              value= data.email || ''
                               placeholder="ejemplo@email.com"
                               required
                             )
+                            if errors.email 
+                              .invalid-feedback= errors.email[0]
+
 
                           .mb-4
                             label.form-label Contraseña
@@ -107,10 +112,13 @@ html
                             input.form-control(
                               type="password"
                               name="password"
+                              class= errors.password ? 'is-invalid' : ''
+                              valie= data.passsword || ''
                               placeholder="••••••••"
                               required
                             )
-
+                            if errors.password
+                              .invalid-feedback= errors.password[0]
                           button.btn.login-btn.w-100.mb-4(type="submit")
                             | Ingresar
 
@@ -119,4 +127,9 @@ html
                               | ¿No tienes cuenta?
                               a.text-dark.fw-semibold.ms-1(href="/auth/signup") Registrarse
         +footer()
-    script(src='/script/bootstrap.bundle.min.js') 
+    script(src='/script/bootstrap.bundle.min.js')
+    script.
+      const form = document.querySelector('.needs-validation')
+        form.addEventListener('submit', e => {
+          form.classList.add('was-validated')
+        })
