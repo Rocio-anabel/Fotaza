@@ -56,7 +56,7 @@ html
                   h1.logo-title Regístrate
                   
 
-                form(action="/auth/signup" method="POST" enctype="multipart/form-data")
+                form(action="/auth/signup" method="POST" enctype="multipart/form-data" novalidate class="needs-validation")
 
                   .row.g-4
 
@@ -66,9 +66,13 @@ html
                       input.form-control(
                         type="text"
                         name="nombre"
+                        value= data.nombre || ''
+                        class= errors.nombre ? 'is-invalid' : ''
                         placeholder="Tu nombre"
                         required
                       )
+                      if errors.nombre
+                        .invalid-feedback= errors.nombre[0]
 
                     // Apellido
                     .col-md-6
@@ -76,9 +80,13 @@ html
                       input.form-control(
                         type="text"
                         name="apellido"
+                        value= data.apellido || ''
+                        class= errors.apellido ? 'is-invalid' : ''
                         placeholder="Tu apellido"
                         required
                       )
+                      if errors.apellido 
+                        .invalid-feedback= errors.apellido[0]
 
                     // Email
                     .col-12
@@ -86,9 +94,13 @@ html
                       input.form-control(
                         type="email"
                         name="email"
+                        value= data.email || ''
+                        class= errors.email ? 'is-invalid' : ''
                         placeholder="ejemplo@email.com"
                         required
                       )
+                      if errors.email
+                        .invalid-feedback= errors.email[0]
 
                     // Contraseña
                     .col-12
@@ -96,28 +108,36 @@ html
                       input.form-control(
                         type="password"
                         name="password"
+                        value= data.password || ''
+                        class= errors.password ? 'is-invalid' : ''
                         placeholder="••••••••"
                         required
                       )
-
+                      if errors.password 
+                        .invalid-feedback= errors.password[0]
                     // Fecha nacimiento
                     .col-md-6
                       label.form-label Fecha de nacimiento
                       input.form-control(
                         type="date"
                         name="fechaNacimiento"
+                        class= errors.fechaNacimiento ? 'is-invalid' : ''
                         required
                       )
+                      if errors.fechaNacimiento 
+                        .invalid-feedback= errors.fechaNacimiento[0]
 
                     // Sexo
                     .col-md-6
                       label.form-label Sexo
-                      select.form-select(name="sexo" required)
+                      select.form-select(name="sexo" class= errors.sexo ? 'is-invalid' : '' required)
                         option(value="" selected disabled) Seleccionar
                         option(value="femenino") Femenino
                         option(value="masculino") Masculino
                         option(value="otro") Otro
                         option(value="prefiero-no-decir") Prefiero no decir
+                      if errors.sexo 
+                        .invalid-feedback= errors.sexo[0]
 
                     // Bio
                     .col-12
@@ -143,3 +163,8 @@ html
                         | Crear cuenta
         +footer()
     script(src='/script/bootstrap.bundle.min.js')
+    script.
+      const form = document.querySelector('.needs-validation')
+        form.addEventListener('submit', e => {
+          form.classList.add('was-validated')
+        })
