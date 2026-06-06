@@ -1,0 +1,88 @@
+mixin publicacionSimplificada(publicacion)
+
+    .card.shadow-sm.rounded-4.overflow-hidden.publicacion-card(
+        data-url=`/publicacion/${publicacion.idPublicacion}`
+    )
+
+        // Header
+        .card-header.bg-white.border-0.py-3
+
+            .d-flex.align-items-center.gap-3
+
+                img.rounded-circle(
+                    src=publicacion.Usuario.avatar ||  '/images/avatar-default.svg'
+                    width="50"
+                    height="50"
+                    style="object-fit: cover;"
+                )
+
+                div
+                    .fw-semibold
+                        | #{publicacion.Usuario.nombre} #{publicacion.Usuario.apellido}
+
+        // Carrusel
+        .position-relative
+
+            .carousel.slide(
+                id=`carousel-${publicacion.idPublicacion}`
+                data-publicacion=publicacion.idPublicacion
+                data-bs-ride="false"
+            )
+
+                .carousel-inner
+
+                    each imagen, index in publicacion.Imagens
+                        small.text-danger= imagen.licencia
+
+                        .carousel-item(
+                            class=index === 0 ? 'active' : ''
+                            data-promedio=imagen.promedioVotos
+                            data-votos=imagen.cantidadVotos
+                        )
+
+                            img.d-block.w-100(
+                                src=imagen.foto
+                                style="height:450px; object-fit:cover;"
+                            )
+
+                if publicacion.Imagens.length > 1
+
+                    button.carousel-control-prev(
+                        type="button"
+                        data-bs-target=`#carousel-${publicacion.idPublicacion}`
+                        data-bs-slide="prev"
+                    )
+                        span.carousel-control-prev-icon
+
+                    button.carousel-control-next(
+                        type="button"
+                        data-bs-target=`#carousel-${publicacion.idPublicacion}`
+                        data-bs-slide="next"
+                    )
+                        span.carousel-control-next-icon
+
+            
+
+        // Body
+        .card-body
+
+            h4.card-title.mb-3
+                = publicacion.titulo
+
+            if publicacion.descripcion
+
+                p.card-text.text-muted.mb-4
+                    = publicacion.descripcion
+
+            // Valoración de la imagen activa
+            .d-flex.align-items-center.gap-2.mb-4(
+                id=`valoracion-${publicacion.idPublicacion}`
+            )
+
+            // Etiquetas
+            .d-flex.flex-wrap.gap-2
+
+                each etiqueta in publicacion.Etiqueta
+
+                    span.badge.rounded-pill.text-bg-dark.px-3.py-2
+                        | ##{etiqueta.nombreEtiqueta}

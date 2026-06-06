@@ -1,0 +1,74 @@
+mixin navbar-auth
+    nav.navbar.bg-light.px-4.py-2.border-bottom.border-5.border-dark.shadow.p-3.mb-5
+            .container-fluid
+
+                a.navbar-brand.m-0(href="/")
+                    img.logo-navbar(src="/images/Fotaza_logo.png" alt="Fotaza" height="50")
+                form.d-flex(action="/buscar", method="POST", role="search")
+                    input.form-control.me-2(type="search" name="texto" placeholder="Buscar" aria-label="Search" required)
+                    button.btn.btn-dark(type="submit") Buscar
+                
+                .d-flex.align-items-center.gap-2
+                    .dropdown
+                        button.btn.p-0.border-0(
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        ) 
+                            img.rounded-circle.shadow-sm(
+                                src= avatar || "/images/avatar-default.svg"
+                                alt="Avatar"
+                                width="40"
+                                height="40"
+                                style="object-fit: cover;"
+                            )
+
+                        ul.dropdown-menu.dropdown-menu-end
+                            li 
+                                a.dropdown-item(href="/publicacion") Mis publicaciones
+                            li
+                                a.dropdown-item(href="/coleccion") Mis colecciones
+                            li
+                                a.dropdown-item(href="/usuario/editar") Editar perfil
+                            li
+                                hr.dropdown-divider
+                            li
+                                a.dropdown-item.text-danger(href="/auth/logout")
+                                    i.bi.bi-box-arrow-right.me-2
+                                    | Cerrar sesión
+                    .dropdown
+                        button.btn.position-relative.border-0.bg-transparent(
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        )
+                            i.bi.bi-bell.fs-4
+
+                            span.position-absolute.badge.rounded-pill.bg-danger(style="top: 2px; right: -8px;")
+                                | 3
+
+                        ul.dropdown-menu.dropdown-menu-end.shadow
+                            li
+                                h6.dropdown-header Notificaciones
+
+                            li
+                                a.dropdown-item(href="#")
+                                    strong Juan
+                                    |  comentó tu foto
+
+                            li
+                                a.dropdown-item(href="#")
+                                    strong María
+                                    |  comenzó a seguirte
+
+                            li
+                                a.dropdown-item(href="#")
+                                    strong Pedro
+                                    |  dio like a tu publicación
+
+                            li
+                                hr.dropdown-divider
+
+                            li
+                                a.dropdown-item.text-center(href="/notificacion")
+                                    | Ver todas

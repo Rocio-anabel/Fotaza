@@ -1,0 +1,126 @@
+include mixins/navbar-auth.pug 
+include mixins/navbar-no-auth.pug
+include mixins/publicacionSimplificada.pug
+
+
+doctype html 
+html
+    head
+        title Búsqueda
+        link(rel='stylesheet', href='/css/bootstrap.min.css')
+        link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css")
+        style.
+
+            .publicacion-card{
+                cursor: pointer;
+                transition: .2s;
+            }
+
+            .publicacion-card:hover{
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px rgba(0,0,0,.12) !important;
+            }
+
+    body
+        if autenticado 
+            +navbar-auth(avatar)
+        else
+            +navbar-no-auth()
+        
+        .container.mt-5
+
+            .text-center.mb-5
+
+                p.fs-4.text-secondary.mb-0
+
+                    i.bi.bi-search.me-2
+
+                    | Búsqueda para "
+
+                    span.text-dark.fw-semibold #{texto}
+
+                    | "
+
+            .row.g-4.justify-content-center
+
+                each publicacion in publicacionesJSON
+
+                    .col-lg-6.col-xl-5
+
+                        +publicacionSimplificada(publicacion)
+                        
+        script(src='/script/bootstrap.bundle.min.js')
+        script.
+
+            function actualizarInformacionImagen(carousel){
+            
+                const publicacionId =
+                    carousel.dataset.publicacion;
+
+                const itemActivo =
+                    carousel.querySelector('.carousel-item.active');
+
+                const promedio =
+                    parseFloat(itemActivo.dataset.promedio);
+
+                const votos =
+                    parseInt(itemActivo.dataset.votos);
+
+                
+
+
+                const valoracionContainer =
+                    document.getElementById(
+                        `valoracion-${publicacionId}`
+                    );
+
+                
+
+                let estrellas = '';
+
+                for(let i = 1; i <= 5; i++){
+                
+                    estrellas += i <= Math.round(promedio)
+                        ? '<i class="bi bi-star-fill text-warning"></i>'
+                        : '<i class="bi bi-star text-secondary"></i>';
+
+                }
+
+                valoracionContainer.innerHTML =
+                    estrellas +
+                    `<span class="text-muted">(${votos} votos)</span>`;
+
+                
+
+            }
+
+            document.querySelectorAll('.carousel')
+                .forEach(carousel => {
+                
+                    actualizarInformacionImagen(carousel);
+
+                    carousel.addEventListener(
+                        'slid.bs.carousel',
+                        () => actualizarInformacionImagen(carousel)
+                    );
+
+                });
+
+            document.querySelectorAll('.publicacion-card')
+                .forEach(card => {
+                
+                    card.addEventListener('click', e => {
+                    
+                        if(
+                            e.target.closest('.carousel-control-prev') ||
+                            e.target.closest('.carousel-control-next')
+                        ){
+                            return;
+                        }
+
+                        window.location.href =
+                            card.dataset.url;
+
+                    });
+
+                });

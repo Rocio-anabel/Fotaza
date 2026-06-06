@@ -2,7 +2,7 @@ import { Publicacion } from "../models/Publicacion.js";
 import { Imagen } from "../models/Imagen.js";
 import { Etiqueta } from "../models/Etiqueta.js";
 import sharp from "sharp";
-import {literal, col} from "sequelize";
+import {literal, col, Op} from "sequelize";
 import { Comentario } from "../models/Comentario.js";
 import { Usuario} from "../models/Usuario.js";
 import {Voto} from "../models/Voto.js";
@@ -50,7 +50,7 @@ export const crearPublicacion = async (req, res) => {
             : '/img/default-avatar.png', errors, data: req.body});
         }
 
-        const {titulo, descripcion = '', etiquetas, licencia, marcaAgua} = req.body;
+        const {titulo, descripcion, etiquetas, licencia, marcaAgua} = req.body;
         const idUsuario = req.session.user.id;
         const imagenes = req.files;
 
@@ -72,8 +72,8 @@ export const crearPublicacion = async (req, res) => {
         for (const img of imagenes){
             const metadata = await sharp(img.buffer).metadata();
             if(licencia){
-                
-                const svg = Buffer.from(`<svg height="40" width="200"> <text x="0" y="20"  font-size="20"  fill="#fff">${marcaAgua}</text></svg>`);
+                let watermark= marcaAgua ?? 'Fotaza';
+                const svg = Buffer.from(`<svg height="40" width="200"> <text x="0" y="20"  font-size="20"  fill="#fff">${watermark}</text></svg>`);
                 const imgWatermark = await sharp(img.buffer)
                                             .composite([{ input: svg, tile: true, top: 0, left: 0, blend: "over"}])
                                             .toBuffer();
@@ -164,8 +164,26 @@ export const mostrarPublicacion = async (req, res) => {
         if(!publicacionCompleta){
             return res.status(404).send("Publicacion no encontrada");
         }
-        
+
         const publicacion = publicacionCompleta.toJSON();
+
+        const publitienelicencia = publicacion.Imagens.some(imagen => imagen.licencia)
+
+
+
+        let usuario = null;
+        let autenticado = false;
+        if(req.session.user){
+            usuario = await Usuario.findByPk(req.session.user.id, {
+            attributes: ['avatar']
+        });
+            autenticado = true;
+        }
+
+        if(publitienelicencia && !autenticado){
+            return res.status(401).render('error', {autenticado, avatar: null, codigoError: 401, mensaje: 'Se requiere autenticación para acceder a esta página'});
+        }
+        
 
         if(publicacion.Usuario.avatar){
             
@@ -187,14 +205,7 @@ export const mostrarPublicacion = async (req, res) => {
 
 
         
-        let usuario = null;
-        let autenticado = false;
-        if(req.session.user){
-            usuario = await Usuario.findByPk(req.session.user.id, {
-            attributes: ['avatar']
-        });
-            autenticado = true;
-        }
+        
 
         res.render('publicacion', {publicacion, autenticado, avatar: usuario?.avatar
             ? `data:image/jpeg;base64,${usuario.avatar.toString('base64')}`
@@ -207,3 +218,100 @@ export const mostrarPublicacion = async (req, res) => {
     }
     
 }
+
+export const buscarPublicaciones = async (req, res) => {
+    try {
+        let usuario = null;
+        let autenticado = false;
+        if(req.session.user){
+            usuario = await Usuario.findByPk(req.session.user.id, {
+            attributes: ['avatar']
+        });
+            autenticado = true;
+        }
+        
+        const {texto} = req.body;
+        
+        const publicaciones = await Publicacion.findAll({
+            attributes: ['idPublicacion', 'id_usuario', 'titulo', 'descripcion'],
+            include: [
+                {
+                    model: Usuario,
+                    required: true,
+                    attributes: ['idUsuario', 'nombre', 'apellido', 'avatar']
+                },
+                {
+                    model: Imagen,
+                    required: true,
+                    attributes: {
+                                    include: [
+                                               [literal('(SELECT COUNT(*) FROM "Voto" WHERE "Voto"."id_imagen" = "Imagens"."id_imagen")'), 'cantidadVotos'],
+                                               [literal('(SELECT AVG("valor") FROM "Voto" WHERE "Voto"."id_imagen" = "Imagens"."id_imagen")'), 'promedioVotos']
+                                             ],
+                                    exclude: ['marcaDeAgua', 'fecha_creacion', 'fecha_actualizacion', 'fecha_borrado']
+                                },
+                    include: [
+                        {
+                            model: Voto,
+                            required: false,
+                            attributes: ['idVoto', 'valor']
+                        }
+                    ]
+                },
+                {
+                    model: Etiqueta,
+                    required: true,
+                    attributes: ['idEtiqueta', 'id_publicacion', 'nombreEtiqueta']
+                }
+            ],
+            where: {
+                [Op.or]: [
+                    { titulo: { [Op.iLike]: `%${texto}%` } },
+                    { descripcion: { [Op.iLike]: `%${texto}%` } },
+                    { '$Etiqueta.nombre_etiqueta$': { [Op.iLike]: `%${texto}%` } }
+                ]
+            }
+        });
+
+        if(!autenticado){
+            const publicacionesSinLicencia = publicaciones.filter(publicacion => {
+                return publicacion.Imagens.every(imagen => !imagen.licencia);
+            });
+
+            const publicacionesJSON = publicacionesSinLicencia.map(p => p.toJSON());
+
+            for (const publicacion of publicacionesJSON) {
+                if(publicacion.Usuario.avatar){
+                    publicacion.Usuario.avatar = `data:image/jpeg;base64,${publicacion.Usuario.avatar.toString('base64')}`;
+                }
+                publicacion.Imagens = publicacion.Imagens.map(img => {
+                    img.foto = `data:image/${img.extension};base64,${img.foto.toString('base64')}`;
+                    return img;
+                });
+            }
+            return res.render('buscar', {publicacionesJSON, autenticado, avatar: null, texto});
+        }
+        const publicacionesJSON = publicaciones.map(p => p.toJSON());
+
+        for (const publicacion of publicacionesJSON) {
+                if(publicacion.Usuario.avatar){
+                    publicacion.Usuario.avatar = `data:image/jpeg;base64,${publicacion.Usuario.avatar.toString('base64')}`;
+                }
+                publicacion.Imagens = publicacion.Imagens.map(img => {
+                    img.foto = `data:image/${img.extension};base64,${img.foto.toString('base64')}`;
+                    return img;
+                });
+        }
+
+        return res.render('buscar', {publicacionesJSON, autenticado, avatar: usuario.avatar
+            ? `data:image/jpeg;base64,${usuario.avatar.toString('base64')}`
+            : '/img/default-avatar.png', texto});
+
+
+
+    } catch (error) {
+        console.error('Error al buscar publicaciones: ', error);
+        return res.status(500).json({message: "Error interno del servidor"});
+    }
+}
+
