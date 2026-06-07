@@ -116,6 +116,17 @@ export const mostrarPublicacion = async (req, res) => {
         if (isNaN(idPublicacion)) {
             return res.status(400).send('ID inválido');
         }
+        let usuario = null;
+        let autenticado = false;
+        let idUsuario = null;
+        usuario = req.session.user
+        if(usuario){
+            idUsuario = usuario.id;
+            usuario = await Usuario.findByPk(idUsuario, {
+            attributes: ['avatar']
+        });
+            autenticado = true;
+        }
 
 
         const publicacionCompleta = await Publicacion.findByPk(idPublicacion, {
@@ -136,7 +147,8 @@ export const mostrarPublicacion = async (req, res) => {
                     attributes: {
                                     include: [
                                                [literal('(SELECT COUNT(*) FROM "Voto" WHERE "Voto"."id_imagen" = "Imagens"."id_imagen")'), 'cantidadVotos'],
-                                               [literal('(SELECT AVG("valor") FROM "Voto" WHERE "Voto"."id_imagen" = "Imagens"."id_imagen")'), 'promedioVotos']
+                                               [literal('(SELECT AVG("valor") FROM "Voto" WHERE "Voto"."id_imagen" = "Imagens"."id_imagen")'), 'promedioVotos'],
+                                               [literal(`(SELECT "Voto".valor FROM "Voto"  WHERE "Voto"."id_imagen" = "Imagens"."id_imagen" AND "Voto"."id_usuario" = ${idUsuario})`),'votoUsuario']
                                              ],
                                     exclude: ['marcaDeAgua', 'fecha_creacion', 'fecha_actualizacion', 'fecha_borrado']
                                 },
@@ -169,17 +181,6 @@ export const mostrarPublicacion = async (req, res) => {
 
         const publitienelicencia = publicacion.Imagens.some(imagen => imagen.licencia)
 
-
-
-        let usuario = null;
-        let autenticado = false;
-        if(req.session.user){
-            usuario = await Usuario.findByPk(req.session.user.id, {
-            attributes: ['avatar']
-        });
-            autenticado = true;
-        }
-
         if(publitienelicencia && !autenticado){
             return res.status(401).render('error', {autenticado, avatar: null, codigoError: 401, mensaje: 'Se requiere autenticación para acceder a esta página'});
         }
@@ -193,6 +194,7 @@ export const mostrarPublicacion = async (req, res) => {
 
         publicacion.Imagens = publicacion.Imagens.map(img => {
             img.foto = `data:image/${img.extension};base64,${img.foto.toString('base64')}`;
+            img.promedioVotos = img.promedioVotos ? parseFloat(img.promedioVotos).toFixed(2) : null;
 
             img.Comentarios = img.Comentarios.map(comentario => {
                 if(comentario.Usuario.avatar){
