@@ -36,8 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderizar(index){
 
         const imagen = imagenes[index];
+        
 
-        let valoracionHTML = ` <form id="formVotoImagen">
+        let valoracionHTML = ` <form id="formVotoImagen" >
 
                                     <input
                                         type="hidden"
@@ -92,6 +93,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const rating = detalle.querySelector('.rating');
 
+        const votoUsuario = imagen.votoUsuario || 0;
+
+        inputValor.value = votoUsuario;
+
+        pintar(votoUsuario);
+
+             
+
         estrellas.forEach(estrella => {
 
             estrella.addEventListener('mouseenter', () => {
@@ -108,14 +117,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 Number(estrella.dataset.valor);
                 inputValor.value = valor;
                 pintar(valor);
-
                 enviarVoto(
                     imagen.idImagen,
                     valor
                 );
+
+                estrellas.forEach(estrella => {
+                    estrella.style.pointerEvents = 'none';
+                });
+              
             });
 
         });
+
+        
 
 
         rating.addEventListener('mouseleave', () => {
@@ -167,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
     async function enviarVoto(idImagen, valor){
 
         try{
-
             await fetch('/voto', {
 
                 method: 'POST',
@@ -181,9 +195,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     idImagen,
                     valor
                 })
-
+                    
             });
-
+            
         }catch(error){
 
             console.error(error);
@@ -192,6 +206,133 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
+    async function enviarComentario(idImagen, comentario){
+
+        try{
+
+            const response = await fetch('/comentario', {
+
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    idImagen,
+                    comentario
+                })
+
+            });
+
+            if(response.status === 401){
+
+                window.location.href = '/auth/login';
+
+                return;
+            }
+
+            if(!response.ok){
+
+                throw new Error(
+                    await response.text()
+                );
+
+            }
+
+            return await response.json();
+
+        }catch(error){
+
+            console.error(error);
+
+        }
+    }
+
+    document.querySelectorAll('.form-comentario')
+        .forEach(form => {
+
+            form.addEventListener(
+                'submit',
+                async e => {
+
+                    e.preventDefault();
+
+                    const idImagen =
+                        form.querySelector(
+                            '[name="idImagen"]'
+                        ).value;
+
+                    const comentarioInput =
+                        form.querySelector(
+                            '[name="comentario"]'
+                        );
+
+                    const comentario =
+                        comentarioInput.value.trim();
+
+                    if(!comentario){
+                        return;
+                    }
+
+                    const resultado =
+                        await enviarComentario(
+                            idImagen,
+                            comentario
+                        );
+
+                    if(resultado){
+
+                        comentarioInput.value = '';
+
+                        const listaComentarios = document.querySelector(`.lista-comentarios[data-imagen="${idImagen}"]`);
+
+                        const comentarioHTML = `
+
+                            <div class="d-flex align-items-start gap-2 mb-3">
+
+                                <img
+                                    class="rounded-circle"
+                                    src= "${resultado.usuario.avatar || '/images/avatar-default.svg'}"
+                                    width="40"
+                                    height="40"
+                                    style="object-fit: cover;"
+                                >
+
+                                <div>
+
+                                    <p class="mb-1">
+
+                                        <strong>
+                                            ${resultado.usuario.nombre}
+                                            ${resultado.usuario.apellido}
+                                        </strong>
+
+                                        ${resultado.comentario}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        `;                      
+
+                        listaComentarios.insertAdjacentHTML(
+                            'beforeend',
+                            comentarioHTML
+                        );
+
+                        const pNoComentarios = document.getElementById('pNoComentarios');
+                        pNoComentarios?.remove();
+
+                        comentarioInput.value = '';
+                }
+                                        
+                                        }
+                                    );
+                                
+                });
     const carousel =
         document.getElementById(
             `postCarousel-${idPublicacion}`

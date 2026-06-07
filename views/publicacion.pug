@@ -140,39 +140,38 @@ html
 
                                         .modal-body
 
-                                            if imagen.Comentarios.length
+                                            .lista-comentarios(data-imagen=imagen.idImagen)
 
-                                                each comentario in imagen.Comentarios
+                                                if imagen.Comentarios.length
 
-                                                    .d-flex.align-items-start.gap-2.mb-3
+                                                    each comentario in imagen.Comentarios
 
-                                                        img.rounded-circle(
-                                                            src=comentario.Usuario.avatar || "/images/avatar-default.svg"
-                                                            width="40"
-                                                            height="40"
-                                                            style="object-fit: cover;"
-                                                        )
+                                                        .d-flex.align-items-start.gap-2.mb-3
 
-                                                        div
+                                                            img.rounded-circle(
+                                                                src=comentario.Usuario.avatar || "/images/avatar-default.svg"
+                                                                width="40"
+                                                                height="40"
+                                                                style="object-fit: cover;"
+                                                            )
 
-                                                            p.mb-1
+                                                            div
 
-                                                                strong= comentario.Usuario.nombre
+                                                                p.mb-1
 
-                                                                |  #{comentario.descripcion}
+                                                                    strong= comentario.Usuario.nombre + ' ' + comentario.Usuario.apellido
 
-                                            else
+                                                                    |  #{comentario.texto}
 
-                                                p.text-muted
-                                                    | Esta imagen aún no tiene comentarios.
+                                                else
+
+                                                    p.text-muted(id='pNoComentarios')
+                                                        | Esta imagen aún no tiene comentarios.
 
                                         .modal-footer
                                             if !imagen.comentarioClausurado
 
-                                                form.w-100(
-                                                    action="/comentarios"
-                                                    method="POST"
-                                                )
+                                                form.w-100.form-comentario
 
                                                     input(
                                                         type="hidden"
