@@ -1,0 +1,84 @@
+include mixins/navbar-auth.pug
+include mixins/navbar-no-auth.pug 
+
+doctype html
+html(lang="es")
+    head
+        title Perfil de Usuario
+        link(rel='stylesheet', href='/css/bootstrap.min.css')
+        link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css")
+
+        style.
+          body {
+            background-color: #f5f5f5;
+          }
+
+          .profile-card {
+            max-width: 500px;
+            margin: 60px auto 30px auto;
+            border-radius: 20px;
+          }
+
+          .avatar {
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #000;
+          }
+
+          .stats span {
+            font-size: 1.1rem;
+          }
+
+    body
+        if autenticado 
+          +navbar-auth(avatar)
+        else 
+          +navbar-no-auth()
+        .container
+            .card.profile-card.shadow-sm.p-4.text-center
+
+
+                .d-flex.justify-content-center.mb-3
+                    img.avatar(
+                    src=usuario.avatar || '/images/avatar-default.svg'
+                    alt="Avatar"
+                    )
+
+
+                h2.mb-1=usuario.nombre + ' ' + usuario.apellido
+
+
+                p.text-muted.mb-4= usuario.bio || ''
+
+
+                .mb-4
+                  if usuario.idUsuario !== idAutenticado
+                    button.btn.px-4#btnSeguir(
+                        class=siguiendo ? 'btn-outline-dark' : 'btn-dark'
+                        data-id-usuario=usuario.idUsuario
+                        data-siguiendo=siguiendo
+                    )
+                        = siguiendo ? 'Siguiendo' : 'Seguir'
+                  
+
+                .d-flex.justify-content-center.gap-5.stats
+
+                  div
+                    h5.mb-0=seguidores
+                    span.text-muted Seguidores
+
+                  div
+                    h5.mb-0=seguidos
+                    span.text-muted Seguidos
+            .posts-container.mt-5
+                 h3.mb-4.text-center Publicaciones
+                 .d-flex.flex-column.align-items-center.gap-4
+
+                    .col-12.col-md-8.col-lg-6
+                        
+                    .col-12.col-md-8.col-lg-6
+                        
+    script(src='/script/bootstrap.bundle.min.js')
+    script(src='/script/perfil.js')
