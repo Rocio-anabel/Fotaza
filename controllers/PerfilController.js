@@ -115,6 +115,13 @@ export const mostrarPerfil = async(req, res) => {
                     }
                     publicacion.Imagens = publicacion.Imagens.map(img => {
                         img.foto = `data:image/${img.extension};base64,${img.foto.toString('base64')}`;
+                        img.promedioVotos = img.promedioVotos ? parseFloat(img.promedioVotos).toFixed(2) : null;
+                        img.Comentarios = img.Comentarios.map(comentario => {
+                            if(comentario.Usuario.avatar){
+                                comentario.Usuario.avatar = `data:image/jpeg;base64,${comentario.Usuario.avatar.toString('base64')}`;
+                            }
+                            return comentario;
+                            });
                         return img;
                     });
                 }
@@ -128,6 +135,13 @@ export const mostrarPerfil = async(req, res) => {
                     }
                     publicacion.Imagens = publicacion.Imagens.map(img => {
                         img.foto = `data:image/${img.extension};base64,${img.foto.toString('base64')}`;
+                        img.promedioVotos = img.promedioVotos ? parseFloat(img.promedioVotos).toFixed(2) : null;
+                        img.Comentarios = img.Comentarios.map(comentario => {
+                            if(comentario.Usuario.avatar){
+                                comentario.Usuario.avatar = `data:image/jpeg;base64,${comentario.Usuario.avatar.toString('base64')}`;
+                            }
+                            return comentario;
+                            });
                         return img;
                     });
             }
