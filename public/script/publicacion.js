@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
     const carousel =
         document.getElementById(
-            `postCarousel-${idPublicacion}`
+            `carousel-${idPublicacion}`
         );
 
     carousel.addEventListener(

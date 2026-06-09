@@ -23,18 +23,20 @@ html
                     .card.shadow-sm.rounded-4.overflow-hidden(data-publicacion-id= publicacion.idPublicacion)
         
                         // HEADER
-                        .card-header.bg-white.border-0.d-flex.align-items-center.gap-2.py-2.px-3
-        
-                            img.rounded-circle.shadow-sm(
-                                src= publicacion.Usuario.avatar ? publicacion.Usuario.avatar : '/images/avatar-default.svg'
-                                alt="Avatar"
-                                width="45"
-                                height="45"
-                                style="object-fit: cover;"
+                        .card-header.bg-white.border-0.py-2.px-3
+                            a.d-flex.align-items-center.gap-2.text-decoration-none.text-dark(
+                                href=`/perfil/${publicacion.Usuario.idUsuario}`
                             )
-        
-                            .d-flex.flex-column
-                                span.fw-semibold= publicacion.Usuario.nombre + ' ' + publicacion.Usuario.apellido
+                                img.rounded-circle.shadow-sm(
+                                    src= publicacion.Usuario.avatar ? publicacion.Usuario.avatar : '/images/avatar-default.svg'
+                                    alt="Avatar"
+                                    width="45"
+                                    height="45"
+                                    style="object-fit: cover;"
+                                )
+            
+                                .d-flex.flex-column
+                                    span.fw-semibold= publicacion.Usuario.nombre + ' ' + publicacion.Usuario.apellido
 
                         
     
@@ -81,14 +83,14 @@ html
                             if publicacion.Imagens.length > 1
                                 button.carousel-control-prev(
                                     type="button"
-                                    data-bs-target= `carousel-${publicacion.idPublicacion}`
+                                    data-bs-target= `#carousel-${publicacion.idPublicacion}`
                                     data-bs-slide="prev"
                                 )
                                     span.carousel-control-prev-icon
 
                                 button.carousel-control-next(
                                     type="button"
-                                    data-bs-target= `carousel-${publicacion.idPublicacion}`
+                                    data-bs-target= `#carousel-${publicacion.idPublicacion}`
                                     data-bs-slide="next"
                                 )
                                     span.carousel-control-next-icon
