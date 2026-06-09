@@ -1,5 +1,6 @@
 include mixins/navbar-auth.pug
 include mixins/navbar-no-auth.pug 
+include mixins/publicacion.pug
 
 doctype html
 html(lang="es")
@@ -72,13 +73,17 @@ html(lang="es")
                   div
                     h5.mb-0=seguidos
                     span.text-muted Seguidos
-            .posts-container.mt-5
-                 h3.mb-4.text-center Publicaciones
-                 .d-flex.flex-column.align-items-center.gap-4
+            if publicacionesJSON[0]
+              .posts-container.mt-5
+                   h3.mb-4.text-center Publicaciones
+                   .d-flex.flex-column.align-items-center.gap-4
+                      each publicacion in publicacionesJSON
+                        .col-12.col-md-8.col-lg-6
+                          +publicacion(publicacion)
 
-                    .col-12.col-md-8.col-lg-6
-                        
-                    .col-12.col-md-8.col-lg-6
                         
     script(src='/script/bootstrap.bundle.min.js')
     script(src='/script/perfil.js')
+    script(src='/script/publicaciones.js')
+    script.
+        window.publicacionesJSON = !{JSON.stringify(publicacionesJSON)};
