@@ -1,7 +1,12 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from '../config/database.js';
+import bcrypt from 'bcrypt';
 
-export class Usuario extends Model {}
+export class Usuario extends Model {
+    validatePassword(password){
+        return bcrypt.compare(password, this.contraseña)
+  }
+}
 
 Usuario.init(
     {
@@ -54,6 +59,16 @@ Usuario.init(
         createdAt: 'fecha_creacion',
         updatedAt: 'fecha_actualizacion',
         paranoid: true,
-        deletedAt: 'fecha_borrado'
+        deletedAt: 'fecha_borrado',
+        hooks:{
+            beforeSave: async (usuario) => {
+                if(!usuario.contraseña) return;
+                if(!usuario.changed('contraseña')) return;
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(usuario.contraseña, salt)
+                usuario.contraseña = hashedPassword;
+
+            }
+        }
     }
 )
