@@ -1,6 +1,6 @@
 import express from 'express';
 import { authFetch } from '../middlewares/authFetch.js';
-import { comentarImagen } from '../controllers/comentarioController.js';
+import { comentarImagen } from '../controllers/ComentarioController.js';
 
 const router= express.Router();
 
