@@ -1,4 +1,6 @@
 import { Usuario } from "../models/Usuario.js";
+import { usuarioSchema } from "../schemas/usuarioSchema.js";
+import { loginSchema } from "../schemas/loginSchema.js";
 
 
 export const renderizarLogin = (req, res) => {
@@ -7,28 +9,23 @@ export const renderizarLogin = (req, res) => {
         return res.redirect('/');
     }
 
-    res.render('login');
+    res.render('login', {errors: [], data: {}});
 
 }
 
 export const login = async (req, res) => {
 
     try {
-        
+        const result = loginSchema.safeParse(req.body);
+        if (!result.success) {
+          return res.status(400).render('login', {
+            errors: result.error.flatten().fieldErrors,
+            data: req.body
+          });
+        }
         const { email, password } = req.body;
         const mail = email.trim();
         const pass = password.trim();
-
-        if(!mail || !pass ){
-            /*res.status(400).render('auth/login', {
-            alert: {
-                    status: "error",
-                    text: "Complete todos los campos"
-                    },
-            formValues: req.body
-            }) */
-            return
-        } 
 
         const user = await Usuario.findOne({
           where: {
@@ -36,26 +33,18 @@ export const login = async (req, res) => {
           }
         });
         if(!user){
-          /*res.status(400).render('auth/login', {
-            alert: {
-              status: "error",
-              text: "Usuario o contrasena incorrecta."
-            },
-            formValues: req.body
-          })*/
+          res.status(400).render('login', {
+            errors: { email: [], password: ['Email o contraseña incorrecta'] }, data: req.body
+          })
           return;
         }
 
         const isValidated = await user.validatePassword(pass);
 
         if(!isValidated){
-          /*res.status(400).render('auth/login', {
-            alert: {
-              status: "error",
-              text: "Usuario o contrasena incorrecta."
-            },
-            formValues: req.body
-          })*/
+          res.status(400).render('login', {
+            errors: { email: [], password: ['Email o contraseña incorrecta'] }, data: req.body
+          })
           return;
         }
     
@@ -78,11 +67,21 @@ export const renderizarSignup = (req, res) => {
         return res.redirect('/');
     }
 
-    res.render('signup');
+    res.render('signup', {errors: [], data: {}});
 }
 
 export const registrarse = async (req, res) => {
     try {
+        
+        const bodyResult = usuarioSchema.safeParse(req.body);
+
+        if (!bodyResult.success) {
+          
+          const errors = bodyResult.error.flatten().fieldErrors;
+
+          return res.render('signup', { errors, data: req.body });
+        }
+
         const {nombre, apellido, email, password, fechaNacimiento, sexo, bio} = req.body;
 
         let avatar;
