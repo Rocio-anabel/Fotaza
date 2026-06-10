@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function enviarVoto(idImagen, valor){
 
         try{
-            await fetch('/voto', {
+            const response = await fetch('/voto', {
 
                 method: 'POST',
 
@@ -197,6 +197,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                     
             });
+            if(response.status === 401){
+
+                window.location.href = '/auth/login';
+
+                return;
+            }
+
+            if(!response.ok){
+
+                throw new Error(
+                    await response.text()
+                );
+            }
             
         }catch(error){
 
