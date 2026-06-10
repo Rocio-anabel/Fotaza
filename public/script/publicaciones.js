@@ -177,7 +177,7 @@ function inicializarPublicacion(card){
     async function enviarVoto(idImagen, valor){
 
         try{
-            await fetch('/voto', {
+            const response = await fetch('/voto', {
 
                 method: 'POST',
 
@@ -192,13 +192,68 @@ function inicializarPublicacion(card){
                 })
                     
             });
-            
+            if(response.status === 401){
+
+                window.location.href = '/auth/login';
+
+                return;
+            }
+
+            if(!response.ok){
+
+                throw new Error(
+                    await response.text()
+                );
+
+            }
         }catch(error){
 
             console.error(error);
 
         }
 
+    }
+        async function enviarComentario(idImagen, comentario){
+
+        try{
+
+            const response = await fetch('/comentario', {
+
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    idImagen,
+                    comentario
+                })
+
+            });
+
+            if(response.status === 401){
+
+                window.location.href = '/auth/login';
+
+                return;
+            }
+
+            if(!response.ok){
+
+                throw new Error(
+                    await response.text()
+                );
+
+            }
+
+            return await response.json();
+
+        }catch(error){
+
+            console.error(error);
+
+        }
     }
 
     document.querySelectorAll('.form-comentario')
@@ -275,7 +330,7 @@ function inicializarPublicacion(card){
                             comentarioHTML
                         );
 
-                        const pNoComentarios = listaComentarios.parentElement.querySelector('.no-comentarios');
+                        const pNoComentarios = listaComentarios.parentElement.querySelector('.pNoComentarios');
                         pNoComentarios?.remove();
                     }                                    
                 });  
