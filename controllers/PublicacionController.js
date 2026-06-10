@@ -270,7 +270,9 @@ export const buscarPublicaciones = async (req, res) => {
                 [Op.or]: [
                     { titulo: { [Op.iLike]: `%${texto}%` } },
                     { descripcion: { [Op.iLike]: `%${texto}%` } },
-                    { '$Etiqueta.nombre_etiqueta$': { [Op.iLike]: `%${texto}%` } }
+                    { '$Etiqueta.nombre_etiqueta$': { [Op.iLike]: `%${texto}%` } },
+                    { '$Usuario.nombre$': {[Op.iLike]: `%${texto}%`}},
+                    { '$Usuario.apellido$': {[Op.iLike]: `%${texto}%`}}
                 ]
             }
         });
