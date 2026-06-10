@@ -12,17 +12,5 @@ export const publicacionSchema = z.object({
                 'Formato inválido. Ejemplo: naturaleza, retrato, blanco, negro'
               )
 })
-    .refine(
-      data => {
-        if (data.licencia === 'on') {
-          return data.marcaAgua && data.marcaAgua.trim() !== '';
-        }
-        return true;
-      },
-      {
-        message: 'La marca de agua es obligatoria',
-        path: ['marcaAgua'], 
-      }
-    );
 
 
