@@ -338,7 +338,7 @@ function inicializarPublicacion(card){
 
     const carousel =
         document.getElementById(
-            `Carousel-${idPublicacion}`
+            `carousel-${idPublicacion}`
         );
 
     carousel?.addEventListener(
