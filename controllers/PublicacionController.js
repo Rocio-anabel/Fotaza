@@ -18,11 +18,11 @@ export const renderizarCrear = async (req, res) => {
         
         res.render('crear-publicacion',  {avatar: usuario.avatar
             ? `data:image/jpeg;base64,${usuario.avatar.toString('base64')}`
-            : '/img/default-avatar.png',
+            : '/images/avatar-default.svg',
             errors: [], data: {} });
 
     } catch (error) {
-        console.error('Error al renderizar crea publicacion: ', error);
+        console.error('Error al renderizar crear publicacion: ', error);
     }
     
 }
@@ -47,7 +47,7 @@ export const crearPublicacion = async (req, res) => {
 
           return res.render('crear-publicacion', {avatar: usuario.avatar
             ? `data:image/jpeg;base64,${usuario.avatar.toString('base64')}`
-            : '/img/default-avatar.png', errors, data: req.body});
+            : '/images/avatar-default.svg', errors, data: req.body});
         }
 
         const {titulo, descripcion, etiquetas, licencia, marcaAgua} = req.body;
@@ -72,8 +72,14 @@ export const crearPublicacion = async (req, res) => {
         for (const img of imagenes){
             const metadata = await sharp(img.buffer).metadata();
             if(licencia){
-                let watermark= marcaAgua ?? 'Fotaza';
-                const svg = Buffer.from(`<svg height="40" width="200"> <text x="0" y="20"  font-size="20"  fill="#fff">${watermark}</text></svg>`);
+                let watermark = 'Fotaza';
+                if(marcaAgua){
+                    watermark= marcaAgua;
+                }
+                const fontSize = Math.round(metadata.width * 0.05); 
+                const svgWidth = Math.round(metadata.width * 0.4);  
+                const svgHeight = fontSize * 2;
+                const svg = Buffer.from(`<svg height="${svgHeight}" width="${svgWidth}"> <text x="10" y="${fontSize * 1.5}" font-size="${fontSize}" fill="#fff" font-family="Arial">${watermark}</text></svg>`);
                 const imgWatermark = await sharp(img.buffer)
                                             .composite([{ input: svg, tile: true, top: 0, left: 0, blend: "over"}])
                                             .toBuffer();
@@ -211,7 +217,7 @@ export const mostrarPublicacion = async (req, res) => {
 
         res.render('publicacion', {publicacion, autenticado, avatar: usuario?.avatar
             ? `data:image/jpeg;base64,${usuario.avatar.toString('base64')}`
-            : '/img/default-avatar.png'});
+            : '/images/avatar-default.svg'});
 
     
     } catch (error) {
@@ -309,7 +315,7 @@ export const buscarPublicaciones = async (req, res) => {
 
         return res.render('buscar', {publicacionesJSON, autenticado, avatar: usuario.avatar
             ? `data:image/jpeg;base64,${usuario.avatar.toString('base64')}`
-            : '/img/default-avatar.png', texto});
+            : '/images/avatar-default.svg', texto});
 
 
 

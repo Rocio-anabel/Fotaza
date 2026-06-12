@@ -152,7 +152,7 @@ export const home = async(req, res) => {
     
             res.render('home', {avatar: usuario.avatar
             ? `data:image/jpeg;base64,${usuario.avatar.toString('base64')}`
-            : '/img/default-avatar.png', publicacionesJSON});
+            : '/images/avatar-default.svg', publicacionesJSON});
     } catch (error) {
         console.error('Error al mostrar el home: ', error);
         return res.status(500).json({message: "Error interno del servidor"});
