@@ -76,7 +76,10 @@ export const crearPublicacion = async (req, res) => {
                 if(marcaAgua){
                     watermark= marcaAgua;
                 }
-                const svg = Buffer.from(`<svg height="40" width="200"> <text x="0" y="20"  font-size="20"  fill="#fff">${watermark}</text></svg>`);
+                const fontSize = Math.round(metadata.width * 0.05); 
+                const svgWidth = Math.round(metadata.width * 0.4);  
+                const svgHeight = fontSize * 2;
+                const svg = Buffer.from(`<svg height="${svgHeight}" width="${svgWidth}"> <text x="10" y="${fontSize * 1.5}" font-size="${fontSize}" fill="#fff" font-family="Arial">${watermark}</text></svg>`);
                 const imgWatermark = await sharp(img.buffer)
                                             .composite([{ input: svg, tile: true, top: 0, left: 0, blend: "over"}])
                                             .toBuffer();
