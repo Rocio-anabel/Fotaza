@@ -18,11 +18,11 @@ export const renderizarCrear = async (req, res) => {
         
         res.render('crear-publicacion',  {avatar: usuario.avatar
             ? `data:image/jpeg;base64,${usuario.avatar.toString('base64')}`
-            : '/img/default-avatar.png',
+            : '/images/avatar-default.svg',
             errors: [], data: {} });
 
     } catch (error) {
-        console.error('Error al renderizar crea publicacion: ', error);
+        console.error('Error al renderizar crear publicacion: ', error);
     }
     
 }
@@ -47,7 +47,7 @@ export const crearPublicacion = async (req, res) => {
 
           return res.render('crear-publicacion', {avatar: usuario.avatar
             ? `data:image/jpeg;base64,${usuario.avatar.toString('base64')}`
-            : '/img/default-avatar.png', errors, data: req.body});
+            : '/images/avatar-default.svg', errors, data: req.body});
         }
 
         const {titulo, descripcion, etiquetas, licencia, marcaAgua} = req.body;
@@ -214,7 +214,7 @@ export const mostrarPublicacion = async (req, res) => {
 
         res.render('publicacion', {publicacion, autenticado, avatar: usuario?.avatar
             ? `data:image/jpeg;base64,${usuario.avatar.toString('base64')}`
-            : '/img/default-avatar.png'});
+            : '/images/avatar-default.svg'});
 
     
     } catch (error) {
@@ -312,7 +312,7 @@ export const buscarPublicaciones = async (req, res) => {
 
         return res.render('buscar', {publicacionesJSON, autenticado, avatar: usuario.avatar
             ? `data:image/jpeg;base64,${usuario.avatar.toString('base64')}`
-            : '/img/default-avatar.png', texto});
+            : '/images/avatar-default.svg', texto});
 
 
 
