@@ -72,7 +72,10 @@ export const crearPublicacion = async (req, res) => {
         for (const img of imagenes){
             const metadata = await sharp(img.buffer).metadata();
             if(licencia){
-                let watermark= marcaAgua ?? 'Fotaza';
+                let watermark = 'Fotaza';
+                if(marcaAgua){
+                    watermark= marcaAgua;
+                }
                 const svg = Buffer.from(`<svg height="40" width="200"> <text x="0" y="20"  font-size="20"  fill="#fff">${watermark}</text></svg>`);
                 const imgWatermark = await sharp(img.buffer)
                                             .composite([{ input: svg, tile: true, top: 0, left: 0, blend: "over"}])
