@@ -76,7 +76,7 @@ export const mostrarPerfil = async(req, res) => {
                                             include: [
                                                        [literal('(SELECT COUNT(*) FROM "Voto" WHERE "Voto"."id_imagen" = "Imagens"."id_imagen")'), 'cantidadVotos'],
                                                        [literal('(SELECT AVG("valor") FROM "Voto" WHERE "Voto"."id_imagen" = "Imagens"."id_imagen")'), 'promedioVotos'],
-                                                       [literal(`(SELECT "Voto".valor FROM "Voto"  WHERE "Voto"."id_imagen" = "Imagens"."id_imagen" AND "Voto"."id_usuario" = ${idUsuario})`),'votoUsuario']
+                                                       [literal(`(SELECT "Voto".valor FROM "Voto"  WHERE "Voto"."id_imagen" = "Imagens"."id_imagen" AND "Voto"."id_usuario" = ${idAutenticado})`),'votoUsuario']
                                                      ],
                                             exclude: ['marcaDeAgua', 'fecha_creacion', 'fecha_actualizacion', 'fecha_borrado']
                                         },
